@@ -94,48 +94,6 @@ def create_basic_problem_template(problem_name,
     return '{}{}.pddl'.format(utils_paths.problem_path, problem_name)
 
 
-# def create_basic_problem_template(problem_name,
-#                                   objects_list,
-#                                   objects_relations,
-#                                   goal_predicates,
-#                                   and_or="and"):
-#
-#     PDDL_OBJECTS = create_objects_list(objects_list)
-#     OBJECTS_FEATURES = create_features_predicates(utils_objects.obj_features, objects_list)
-#
-#     with open('{}{}.pddl'.format(utils_paths.problem_path, problem_name), 'w') as f:
-#
-#         lines = ['(define\n',
-#                  '\t(problem {})\n'.format(problem_name),
-#                  '(:domain {})\n'.format(utils_variables.DOMAIN_NAME),
-#                  '\n(:objects\n']
-#
-#         f.writelines(lines)
-#
-#         for obj in PDDL_OBJECTS:
-#             f.write('{}\n'.format(obj))
-#         f.write(')\n')
-#
-#         f.write('(:init\n')
-#
-#         for feature in OBJECTS_FEATURES:
-#             f.write('({})\n'.format(feature))
-#
-#         for feature in objects_relations:
-#             f.write('({})\n'.format(feature))
-#
-#         f.write('(can_move)\n')
-#         f.write('(arm_free)\n')
-#         f.write(')\n')
-#
-#         f.write('\n(:goal ({}\n'.format(and_or))
-#         for goal_pred in goal_predicates:
-#             f.write('{}\n'.format(goal_pred))
-#         f.write(')))\n')
-#
-#     return '{}{}.pddl'.format(utils_paths.problem_path, problem_name)
-
-
 def create_problem(problem_name,
                    object_list,
                    objects_relations,
@@ -164,21 +122,3 @@ def create_problem(problem_name,
             goal_predicates.append('({} {})'.format(action_dict[problem_name.split('_')[0]], obj))
 
     create_basic_problem_template(problem_name, object_list, objects_relations, goal_predicates)
-
-
-# def create_random_problem():
-#     problem_name = random.choice(['pick_and_place', 'stack_and_place', 'heat_and_place'])
-#
-#     print("Problem chosen: {}\n\n\n".format(problem_name))
-#
-#     obj1 = generate_random_object(objects)
-#     obj2 = generate_random_object(objects)
-#
-#     while obj1 == obj2:
-#         obj2 = generate_random_object(objects)
-#
-#     create_problem(problem_name, obj1, obj2)
-
-
-# # Get Objects list
-# objects = pd.read_csv(utils_paths.data_path + 'new_object_name.csv')['new_name'].tolist()

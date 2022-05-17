@@ -42,10 +42,6 @@ parser.add_argument('--steps', type=int, default=3000, help='Logging, Evaluating
 # Output Params
 parser.add_argument('--beam', type=int, default=3, help='Multiple sentences in output')
 
-# group = parser.add_mutually_exclusive_group()
-# group.add_argument('-q', '--quiet', action='store_true', help='print quiet')
-# group.add_argument('-v', '--verbose', action='store_true', help='print verbose')
-
 
 args = parser.parse_args()
 

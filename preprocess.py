@@ -46,19 +46,24 @@ def validate_and_split(args, train_size):
         for mode in ['val/seen', 'val/unseen']:  # 'train',
             validate_orig_data(mode)
 
+    data_path = '{}{}/'.format(utils_paths.csv_path, train_size)
+    utils_paths.check_and_create_dir(data_path)
+    datasets = {}
+    for mode in ['orig_train', 'val_seen', 'val_unseen']:
+        mode_to_dict = 'train' if 'train' in mode else mode
+        datasets[mode_to_dict] = pd.read_csv('{}{}_data_with_pddl.csv'.format(utils_paths.csv_path, mode))
+
     if args.re_split:
-        datasets = {}
-        for mode in ['orig_train', 'val_seen', 'val_unseen']:
-            mode_to_dict = 'train' if 'train' in mode else mode
-            datasets[mode_to_dict] = pd.read_csv('{}{}_data_with_pddl.csv'.format(utils_paths.csv_path, mode))
+        new_datasets = utils_functions.train_val_test_split(datasets, args.train_test_split)
+    else:
+        new_datasets = {'train': datasets['train'],
+                        'val': datasets['val_seen'],
+                        'test': datasets['val_unseen'],
+                        'test_unseen': datasets['val_unseen']}
 
-        datasets = utils_functions.train_val_test_split(datasets, args.train_test_split)
-        data_path = '{}{}/'.format(utils_paths.csv_path, train_size)
-        utils_paths.check_and_create_dir(data_path)
-
-        for mode, df in datasets.items():
-            print('\nMode {}, Shape: {}'.format(mode, df.shape))
-            df.to_csv('{}{}_data_with_pddl.csv'.format(data_path, mode), index=False)
+    for mode, df in new_datasets.items():
+        print('\nMode {}, Shape: {}'.format(mode, df.shape))
+        df.to_csv('{}{}_data_with_pddl.csv'.format(data_path, mode), index=False)
 
 
 def read_data(mode, args, train_size):
@@ -66,10 +71,6 @@ def read_data(mode, args, train_size):
     data_path = '{}{}/'.format(utils_paths.csv_path, train_size)
 
     df = pd.read_csv('{}{}_data_with_pddl.csv'.format(data_path, mode))
-
-    # if use_meta:
-    #     df = df[df['valid_meta'] == 'Valid']
-    # else:
     df = df[df['solution valid'] == 'Valid']
 
     prediction_df = create_df_for_prediction(deepcopy(df), args.input_type)
@@ -122,4 +123,3 @@ def load_clean_datasets(model_name, input_type, modes, train_size):
     for mode in modes:
         datasets[mode] = pd.read_csv('{}{}_clean_data.csv'.format(data_dir, mode))
     return datasets
-

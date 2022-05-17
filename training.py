@@ -1,11 +1,8 @@
-import KB
 import torch
 import prediction
 import pandas as pd
 from tqdm import tqdm
-import text_to_pddl as tt
 import data_validator as validator
-from collections import defaultdict
 from torch.utils.data import DataLoader
 from dataset_preprocess import AlfredDataset
 from Utils import utils_model, utils_variables, utils_paths, utils_functions, utils_objects
@@ -148,40 +145,6 @@ def clean_goal_predicates(goal_predicates):
         print('Different size goal predicates - {} and {}'.format(goal_predicates, clean_predicates))
 
     return clean_predicates
-
-
-# def create_problem_with_meta(problem, relations, goal_predicates):
-#     goal_predicates_cleaned = clean_goal_predicates(goal_predicates)
-#
-#     problem_split = problem.split('\n')
-#     relations_split = relations.split(', ')
-#
-#     objects = get_objects_from_relations(relations_split)
-#     objects_to_add = ['{} - object'.format(obj) for obj in objects]
-#     relations_split = list(set(['({})'.format(relation) for relation in relations_split]))
-#
-#     dup_list = objects_to_add + relations_split
-#
-#     new_problem = []
-#     for i in range(len(problem_split)):
-#
-#         if problem_split[i] in dup_list:
-#             continue
-#
-#         new_problem.append(problem_split[i])
-#
-#         if 'objects' in problem_split[i]:
-#             new_problem += objects_to_add
-#
-#         if 'init' in problem_split[i]:
-#             new_problem += relations_split
-#
-#         if 'goal' in problem_split[i]:
-#             new_problem += goal_predicates_cleaned
-#             new_problem += [')))']
-#             break
-#
-#     return '\n'.join(new_problem)
 
 
 def convert_goal_to_pddl(goal_predicates_cleaned):
@@ -410,8 +373,8 @@ def eval_all(datasets, model_params, task_type, input_type, model_type, beam, se
     precision_per_value = {}
     recall_per_value = {}
 
-    # modes_for_eval = ['val', 'test', 'test_unseen']
-    modes_for_eval = ['test_unseen']
+    modes_for_eval = ['val', 'test', 'test_unseen']
+    # modes_for_eval = ['test_unseen']
     for mode in modes_for_eval:
         loader = get_loader_from_df('valid', datasets[mode], tokenizer, model_params, task_type)
 
@@ -481,104 +444,3 @@ def get_data_dict(task_type, datasets):
             actions_datasets[mode] = actions_data
         data_dict = {'goal': goal_datasets, 'actions': actions_datasets}
     return data_dict
-
-
-
-# def calc_pddl_correct(actual, predictions, df, mode, model_type, input_type, goal_col_name, both=''):
-#     print('\nCalculating PDDL correct for model {}, mode {} and goal columns name - {}'.format(model_type.upper(),
-#                                                                                                mode.upper(),
-#                                                                                                goal_col_name.upper()))
-#
-#     problems = df['pddl problem'].tolist()
-#     objects = df['obj_meta'].tolist()
-#     relations = df['relations_meta'].tolist()
-#
-#     equal = 0
-#     correct_total = 0
-#
-#     true_after_pddl = []
-#
-#     tqdm_obj = tqdm(enumerate(actual), total=len(actual))
-#     tree_plans_len_hist_total = defaultdict(int)
-#     tree_plans_len_hist_valid = defaultdict(int)
-#
-#     for i, true_actions in tqdm_obj:
-#         true_action_seq = true_actions.replace(' .', '.')
-#         kb_dict = {'on': set(utils_functions.split_predicate_seq(relations[i])), 'can_reach': set(), 'has': set()}
-#         objects_dict = utils_functions.create_object_type_dict(objects[i])
-#
-#         problem = problems[i]
-#         pred_list = predictions[i].split('|')
-#
-#         problem_with_meta_data, goal_predicates_cleaned = \
-#             clean_and_insert_pddl_goal_to_problem(problem, df.at[i, goal_col_name])
-#
-#         if problem_with_meta_data == '':
-#             # print('Bad Goal Prediction! Goal: {}\n\n'.format(df.at[i, goal_col_name]))
-#             continue
-#
-#         with open(utils_paths.problem_path + 'tmp_problem.pddl', 'w') as d:
-#             for line in problem_with_meta_data:
-#                 d.write(line)
-#
-#         for j, action_seq in enumerate(pred_list):
-#             if action_seq == '':
-#                 continue
-#             if action_seq[-1] != '.':
-#                 action_seq += '.'
-#             if true_action_seq == action_seq:
-#                 equal += 1
-#                 break
-#
-#             search_tree = KB.Tree(kb_dict, objects_dict, utils_functions.split_predicate_seq(action_seq))
-#             final_nodes = search_tree.start_search()
-#             all_plans = set([KB.generate_plan_from_child(x) for x in final_nodes])
-#             tree_plans_len_hist_total[len(all_plans)] += 1
-#
-#             # print("Generated {} Plans with KB Tree".format(len(all_plans)))
-#             solution_valid = False
-#             for k, plan in enumerate(all_plans):
-#                 if k > 30:
-#                     break
-#                 pred_pddl_plan = tt.convert_meta_actions_to_pddl(plan)
-#
-#                 solution_valid = validator.validate_with_output_reading(pred_pddl_plan,
-#                                                                         utils_paths.problem_path + 'tmp_problem.pddl')
-#
-#                 if solution_valid:
-#                     tree_plans_len_hist_valid[len(all_plans)] += 1
-#
-#                     correct_total += 1
-#
-#                     true_after_pddl.append([true_action_seq, action_seq, plan, j,
-#                                             df.at[i, goal_col_name],
-#                                             goal_predicates_cleaned,
-#                                             problem_with_meta_data])
-#                     break
-#             if solution_valid:
-#                 break
-#
-#     pddl_result_dir = '{}/{}/{}/{}/Predictions/PDDL/'.format(utils_paths.results_path_csv,
-#                                                              model_type,
-#                                                              both + 'Actions',
-#                                                              input_type)
-#
-#     utils_paths.check_and_create_dir(pddl_result_dir)
-#     pd.DataFrame(tree_plans_len_hist_total, index=[0]).to_csv('{}All_plans_length_hist_total_{}_{}.csv'.
-#                                                               format(pddl_result_dir, mode,
-#                                                                      goal_col_name.split('_')[0] + '_goal'))
-#     pd.DataFrame(tree_plans_len_hist_valid, index=[0]).to_csv('{}All_plans_length_hist_valid_{}_{}.csv'.
-#                                                               format(pddl_result_dir, mode,
-#                                                                      goal_col_name.split('_')[0] + '_goal'))
-#
-#     pd.DataFrame(true_after_pddl, columns=['True Action Sequence ',
-#                                            'Pred Action Sequence',
-#                                            'Plan from Tree Search',
-#                                            'Beam Num',
-#                                            'Goal before cleaning',
-#                                            'Goal after cleaning',
-#                                            'Problem']).\
-#             to_csv('{}pddl_predictions_{}_{}.csv'.format(pddl_result_dir, mode, goal_col_name.split('_')[0] + '_goal'))
-#
-#     print('Correct Equal: {}\nCorrect PDDL: {}\n'.format(equal, correct_total))
-#     return correct_total + equal

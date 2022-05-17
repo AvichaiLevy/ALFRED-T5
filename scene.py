@@ -64,7 +64,6 @@ def get_recept_from_metadata(obj, metadata, param):
             possible_recept.append(utils_functions.extract_obj_id(obj1))
     if len([x for x in possible_recept if 'stoveburner' not in x]) > 1 and obj.split('|')[0] not in \
             ['faucet', 'showerglass', 'showercurtain', 'sink', 'tvstand', 'houseplant']:
-        # print('Obj {} has more than one receptacle - {}'.format(obj, possible_recept))
         utils_variables.more_than_one_recept_in_metadata += 1
     return possible_recept
 
@@ -106,7 +105,6 @@ def get_scene_info_from_metadata(metadata):
         obj_used_ids[obj_name].add(rand_id)
         obj_dup_name = '{}{}'.format(obj_name, rand_id).lower()
 
-        # obj_dup_name = '{}{}'.format(obj_name, all_objects[obj_name]).lower()
         all_dup_names.add(obj_dup_name)
         all_objects_with_id.add(obj_id_name)
         loc_id_to_num_id[obj_id_name] = obj_dup_name

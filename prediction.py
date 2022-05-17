@@ -323,9 +323,7 @@ def get_params_from_predicate(goal_predicate):
 
 def create_precision_and_recall_dicts_goal(correct_counter_dict,
                                            per_goal_correct,
-                                           per_obj_correct,
-                                           total_counter,
-                                           total_counter_dict_object):
+                                           total_counter):
     precision_dict = \
         {'arg1': round(correct_counter_dict['arg1'] / total_counter['arg1_pred'], 3),
          'p_arg1': round(correct_counter_dict['p_arg1'] / total_counter['arg1_pred'], 3),
@@ -357,13 +355,6 @@ def create_precision_and_recall_dicts_goal(correct_counter_dict,
 
     precision_per_obj = {}
     recall_per_obj = {}
-    # for correct_type, val in per_obj_correct.items():
-    #     pred_name = correct_type + '_pred'
-    #     true_name = correct_type + '_true'
-    #     if pred_name in total_counter_dict_object:
-    #         precision_per_obj[correct_type] = round(val / total_counter_dict_object[pred_name], 3)
-    #         recall_per_obj[correct_type] = round(val / total_counter_dict_object[true_name], 3)
-
     for key in ['predicate_type', 'f_predicate', 'f_predicate_sim']:
         precision_dict[key] = round(correct_counter_dict[key] / total_counter['predicates_pred'], 3)
         recall_dict[key] = round(correct_counter_dict[key] / total_counter['predicates_true'], 3)
@@ -446,8 +437,7 @@ def accuracy_cal_goals(orig_goal, pred_goal, mode, input_name, train_size, model
             correct_counter_dict['f_seq_sim'] += 1
 
     precision_recall_dicts = \
-        create_precision_and_recall_dicts_goal(correct_counter_dict, per_goal_correct, per_obj_correct, 
-                                               total_counter_dict, total_counter_dict_object)
+        create_precision_and_recall_dicts_goal(correct_counter_dict, per_goal_correct, total_counter_dict)
 
     data_dir = '{}/{}/{}/{}/{}/'.format(utils_paths.results_path_csv, model_name,
                                         both_add + 'Goal', input_name, train_size)
