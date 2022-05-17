@@ -8,6 +8,7 @@ To reproduce the results presented in the paper:
 This data is the original ALFRED data after the plan validation process and the scene data integration, if you wish to validate the original data again, make sure you download the ALFRED dataset first. However, the scene information will need to be loaded again from the AI2Thor simulator.
 3. There are two bash scripts provided, you can edit the scripts to change the hyper-parameter or the model.
 4. In terminal run the command: bash script_name.sh (which run the main.py file with required parameters)
+5. For the PDDL valid plan scores, after the training process run the script "Create_PDF_with_pddl_acc.py"
 
 
 All experiments were conducted using the NVIDIA A100 GPU, with 40GB GPU RAM. Tuning the models on the Task, Relations, and Task+Relations inputs types last for 2, 2, and 3 hours on the T5-base model, and 1, 4, and 5 hours on the GPT2-medium model, respectively.
