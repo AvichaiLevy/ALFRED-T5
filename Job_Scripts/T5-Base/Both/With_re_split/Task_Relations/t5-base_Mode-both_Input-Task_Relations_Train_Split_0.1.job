@@ -1,0 +1,12 @@
+#!/bin/bash
+#SBATCH --gpus=1
+srun  --container-image ~/work/container_21.07.sqsh  --container-mounts /home/avichai/work/From_PC:/data \
+python -u  /data/main.py \
+	-model t5-base \
+	-tt both \
+	-epochs 25 \
+	-input task,relations_meta_wo_ids \
+	--beam 5 \
+	-bs 16 \
+	--re_split \
+    --train_test_split 0.9

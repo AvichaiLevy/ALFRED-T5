@@ -1,0 +1,10 @@
+#!/bin/bash
+#SBATCH --gpus=1
+srun  --container-image ~/container_21.07.sqsh  --container-mounts /home/avichai/From_PC:/data \
+python -u  /data/main.py \
+	-model t5-base \
+	-tt goal \
+	-epochs 30 \
+	-input task,relations_meta_wo_ids \
+	--beam 1 \
+	-bs 16
