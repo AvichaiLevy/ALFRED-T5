@@ -10,4 +10,4 @@ This data is the original ALFRED data after the plan validation process and the 
 4. In terminal run the command: bash script_name.sh
 
 
-
+All experiments were conducted using the NVIDIA A100 GPU, with 40GB GPU RAM. Tuning the models on the Task, Relations, and Task+Relations inputs types last for 2, 2, and 3 hours on the T5-base model, and 1, 4, and 5 hours on the GPT2-medium model, respectively.
