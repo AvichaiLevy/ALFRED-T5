@@ -1140,7 +1140,7 @@ def get_all_meta_actions_relations_objects(metadata,
 
     sol_path = utils_paths.add + 'Data/{}/Solutions/{}_solution.soln'.format(valid_add[0], this_problem_prefix)
     write_solution(path=sol_path, actions=pddl_actions)
-
+    #
     random.shuffle(relations_meta)
     random.shuffle(obj_meta)
 
