@@ -1,2 +1,2 @@
-# ALFRED---T5
+# ALFRED-T5
 Understanding Natural Language in Context
