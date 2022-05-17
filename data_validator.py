@@ -24,22 +24,6 @@ def command_available(command):
 def validator_available():
     return command_available(["Validate", "-h"])
 
-#
-# def validate_solution_pp(domain_file, problem_file, solution_file):
-#     if not validator_available():
-#         print('Validator Not Available!!!')
-#         return
-#
-#     cmd = ["Validate", '-v', domain_file, problem_file, solution_file]
-#     exitcode = subprocess.call(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-#     return exitcode == 0
-#
-#
-# def validate_solution(pddl_actions, problem_path):
-#     tmp_path = utils_paths.data_path + 'tmp.soln'
-#     write_solution(path=tmp_path, actions=pddl_actions)
-#     return validate_solution_pp(utils_paths.domain_path + 'ALFRED_domain.pddl', problem_path, tmp_path)
-
 
 def find_solution(problem_path):
     cmd = ["ff", '-o', utils_paths.domain_path + 'with_template/ALFRED_domain.pddl', '-f', problem_path]
@@ -100,13 +84,11 @@ def get_object_for_receptacle_action(actions_for_pddl,
 
     if 'coordinateReceptacleObjectId' in planner_action_dict:
         pddl_receptacle = planner_action_dict['coordinateReceptacleObjectId'][0].lower()
-        # actions_for_pddl, actions = add_goto_if_needed(actions_for_pddl, actions, pddl_receptacle, new_names)
 
     else:
         exist_receptacle = False
         utils_variables.missing_receptacle_obj[disc_action] += 1
         if disc_action == 'pick up':
-            # actions_for_pddl, actions = add_goto_if_needed(actions_for_pddl, actions, pddl_obj, new_names)
             utils_variables.pickup_only_one_actions += 1
             actions_for_pddl.append('(pickupobject_only_one {})'.format(pddl_obj))
             actions.append('pick up {}'.format(new_names[pddl_obj]))
@@ -547,25 +529,6 @@ def insert_data_into_dict(big_data_dict,
 
         for key in ['relations_meta_wo_ids', 'obj_meta']:
             big_data_dict[samples_counter][key] = ', '.join(meta_data[key])
-
-        # for key, val in meta_data.items():
-        #     if key == 'problem_path_meta':
-        #         with open(val, 'r') as file:
-        #             big_data_dict[samples_counter][key] = file.read()
-        #     elif key == 'valid_meta' or key == 'actions_meta':
-        #         big_data_dict[samples_counter][key] = val
-        #     elif key not in ['goal_predicates_meta', 'pddl_actions_meta', 'sol_path']:
-        #         random.shuffle(val)
-        #         big_data_dict[samples_counter][key] = ', '.join(val)
-        #     else:
-        #         big_data_dict[samples_counter][key] = ', '.join(val)
-        #
-        # if 'goal_predicates_meta' in meta_data:
-        #     if 'two' not in sol_path and \
-        #             len(big_data_dict[samples_counter]['goal'].split(',')) != \
-        #             len(big_data_dict[samples_counter]['goal_predicates_meta'].split(',')):
-        #         utils_variables.different_goal_len += 1
-
         samples_counter += 1
 
     return big_data_dict, samples_counter
@@ -734,7 +697,6 @@ def get_objects_and_params(obj_name, recept_name=''):
         params_names = [obj_name]
 
     params_wo_ids = params_names
-    # params_wo_ids = [x.split('_')[0] for x in params_names]
     return params_names, params_wo_ids
 
 
